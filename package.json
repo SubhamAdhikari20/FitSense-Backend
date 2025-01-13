@@ -1,0 +1,26 @@
+{
+  "name": "fitsense-backend_server",
+  "version": "1.0.0",
+  "description": "FitSense Backend and Database Connection",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "FitSense",
+    "React",
+    "Fitness"
+  ],
+  "author": "Subham Adhikari",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "pg": "^8.13.1"
+  }
+}
