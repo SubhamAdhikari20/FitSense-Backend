@@ -2,6 +2,8 @@
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
+const sequelize = require("./database/Database");
+const userRoute = require("./routes/UserRoute");
 
 // Creating a server 
 const app = express();
@@ -23,6 +25,9 @@ app.get("/notice", (req, res)=>{
     res.send("This is notice");
 
 });
+
+// User Route
+app.get("/user", userRoute);
 
 
 
