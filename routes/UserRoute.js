@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 // Import UserController
-const userController = require("./../controller/UserController");
+const userController = require("../controllers/UserController");
 
 
 router.get("/view_users", userController.getUser);

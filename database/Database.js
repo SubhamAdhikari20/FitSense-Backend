@@ -1,9 +1,13 @@
 const {Sequelize} = require("sequelize");
 
-const sequelize = new Sequelize("fitsense", "postgres", "admin", {
-    host: "localhost",
-    dialect: "postgres",
-    port: "5432",
+// Load env file
+const dotenv = require("dotenv");
+dotenv.config();
+
+const sequelize = new Sequelize(process.env.DATABASE_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
+    host: process.env.DB_HOST,
+    dialect: process.env.DB_DIALECT,
+    port: process.env.DB_PORT,
     logging: false,
 });
 
