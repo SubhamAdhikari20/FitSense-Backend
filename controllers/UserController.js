@@ -50,7 +50,7 @@ const registerUser = async (req, res) => {
 
 
 
-const loginUser = async() => {
+const loginUser = async(req, res) => {
     const {email, password} = req.body;
 
     // validate username, password 
@@ -127,4 +127,4 @@ const getAllUsers = async(req, res) => {
 
 
 
-module.exports = {registerUser, loginUser, getUserById, getAllUsers};
+module.exports = {registerUser, loginUser, getUserByTd, getAllUsers};

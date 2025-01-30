@@ -48,7 +48,7 @@ const registerTrainer = async (req, res) => {
 
 
 
-const loginTrainer = async() => {
+const loginTrainer = async(req, res) => {
     const {email, password} = req.body;
 
     // validate trainername, password 

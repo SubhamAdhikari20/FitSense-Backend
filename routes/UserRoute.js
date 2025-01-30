@@ -8,10 +8,10 @@ const userController = require("../controllers/UserController");
 
 router.post("/register_user", userController.registerUser);
 router.post("/login_user", userController.loginUser);
-router.get("/view_user_by_id", userController.getUserById);
-router.get("/view_all_users", userController.getAllUsers);
-router.put("/update_user", userController.updateUser);
-router.delete("/delete_user", userController.deleteUser);
+// router.get("/view_user_by_id", userController.getUserById);
+// router.get("/view_all_users", userController.getAllUsers);
+// router.put("/update_user", userController.updateUser);
+// router.delete("/delete_user", userController.deleteUser);
 
 
 
