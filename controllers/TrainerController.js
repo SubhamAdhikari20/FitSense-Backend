@@ -92,7 +92,7 @@ const loginTrainer = async() => {
 
 
 
-const getTrainerByid = async (req, res) => {
+const getTrainerById = async (req, res) => {
     const { id } = req.params; 
 
     try {
@@ -123,4 +123,4 @@ const getAllTrainers = async(req, res) => {
 
 
 
-module.exports = {registerTrainer};
+module.exports = {registerTrainer, loginTrainer, getTrainerById, getAllTrainers};

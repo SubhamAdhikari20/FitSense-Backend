@@ -96,7 +96,7 @@ const loginUser = async() => {
 
 
 
-const getUserByid = async (req, res) => {
+const getUserByTd = async (req, res) => {
     const { id } = req.params; 
 
     try {
@@ -127,4 +127,4 @@ const getAllUsers = async(req, res) => {
 
 
 
-module.exports = {registerUser};
+module.exports = {registerUser, loginUser, getUserById, getAllUsers};

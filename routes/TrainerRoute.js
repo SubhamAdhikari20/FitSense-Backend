@@ -7,10 +7,11 @@ const trainerController = require("../controllers/TrainerController");
 
 
 router.post("/register_trainer", trainerController.registerTrainer);
-// router.post("/login_trainer", trainerController.loginTrainer);
-// router.get("/view_trainerbyid", trainerController.getTrainerByid);
-// router.put("/:id", trainerController.updateTrainer);
-// router.delete("/:id", trainerController.deleteTrainer);
+router.post("/login_trainer", trainerController.loginTrainer);
+router.get("/view_trainer_by_id", trainerController.getTrainerById);
+router.get("/view_all_trainers", trainerController.getAllTrainers);
+router.put("/update_trainer", trainerController.updateTrainer);
+router.delete("/delete_trainer", trainerController.deleteTrainer);
 
 // Export the route
 module.exports = router;
