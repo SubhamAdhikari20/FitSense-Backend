@@ -1,14 +1,18 @@
 const express = require("express");
-
 const router = express.Router();
 
 // Import UserController
 const userController = require("../controllers/UserController");
+// const uploadImage = require("./middleware/UploadImage");
 
 
-router.get("/view_users", userController.getUser);
+router.post("/register_user", userController.registerUser);
+// router.post("/login_user", userController.loginUser);
+// router.get("/view_userbyid", userController.getUserByid);
+// router.put("/:id", userController.updateUser);
+// router.delete("/:id", userController.deleteUser);
 
-router.post("/create_users", userController.createUser);
+
 
 // Export the route
 module.exports = router;

@@ -1,14 +1,15 @@
+// Load env file
+const dotenv = require("dotenv");
+dotenv.config();
+
 // Initializaton 
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const sequelize = require("./database/Database");
+const {databaseConnection} = require("./database/Database");
 const userRoute = require("./routes/UserRoute");
 const trainerRoute = require("./routes/TrainerRoute");
 
-// Load env file
-const dotenv = require("dotenv");
-dotenv.config();
 
 // Creating a server 
 const app = express();
@@ -19,22 +20,11 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
 
 
-// Routes
-app.get("/", (req, res)=>{
-    res.send("Welcome to the page");
-    
-});
-
-app.get("/notice", (req, res)=>{
-    res.send("This is notice");
-
-});
-
 // User Route
-app.get("/user", userRoute);
+app.use("/user", userRoute);
 
 // Trainer Route
-app.get("/trainer", trainerRoute);
+app.use("/trainer", trainerRoute);
 
 
 // Creating a port 
@@ -44,4 +34,7 @@ const PORT = process.env.SERVER_PORT
 app.listen(PORT, ()=>{
     console.log(`Server is running on......................... PORT: ${PORT}`);
     
-})
+});
+
+
+databaseConnection();
