@@ -60,9 +60,9 @@ const loginTrainer = async(req, res) => {
     }
     try {
         // Check existing trainer
-        const checkExistingTrainer = await trainerModel.findOne({where: email});
+        const checkExistingTrainer = await trainerModel.findOne({where: {email}});
         if (!checkExistingTrainer) {
-            return res.status(400).json({error: "Trainer already exist!"})
+            return res.status(400).json({error: "Trainer doesnot already!"})
         }
 
 

@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt");
 
 
 const registerUser = async (req, res) => {
-    const {fullName, email, phoneNumber, password} = req.body;
+    const { fullName, email, phoneNumber, password } = req.body;
     // const profilePicture = req.
 
     // validate username, password 
@@ -13,91 +13,110 @@ const registerUser = async (req, res) => {
         return res.status(400).json({
             error: "Please, insert details"
         });
-        
+
     }
 
     try {
         // Check existing user
         console.log(fullName, email, phoneNumber);
-        const checkExistingUser = await userModel.findOne({where: {email}});
+        const checkExistingUser = await userModel.findOne({ where: { email } });
         if (checkExistingUser) {
-            return res.status(400).json({error: "Email already exist!"})
+            return res.status(400).json({ error: "Email already exist!" })
         }
-        
+
         // Hash the password
         const saltRound = 10;
         const hashedPassword = await bcrypt.hash(password, saltRound);
 
         // Create new User
         const newUser = await userModel.create({
-            fullName, 
-            email, 
-            phoneNumber, 
+            fullName,
+            email,
+            phoneNumber,
             password: hashedPassword
         });
 
         // console.log(newUser)
-        res.status(200).json({message: "User registered successfully!", user: newUser});
-        
-    } 
+        res.status(200).json({ message: "User registered successfully!", user: newUser });
+
+    }
     catch (error) {
         // console.log(fullName, email, phoneNumber);
         console.log("Error registering user:", error);
-        res.status(200).json({error: "Something went wrong!"});
+        res.status(200).json({ error: "Something went wrong!" });
     }
 
 };
 
 
 
-const loginUser = async(req, res) => {
-    const {email, password} = req.body;
+const loginUser = async (req, res) => {
+    const { email, password } = req.body;
 
     // validate username, password 
     if (!email || !password) {
         return res.status(400).json({
             error: "Please, enter email and password"
         });
-        
+
     }
+
     try {
         // Check existing user
-        const checkExistingUser = await userModel.findOne({where: email});
+
+        const checkExistingUser = await userModel.findOne({ where: { email } });
         if (!checkExistingUser) {
-            return res.status(400).json({error: "User already exist!"})
+            return res.status(400).json({ error: "User does not exist!" })
         }
 
 
         //Verify User
-        const isMatch = await bcrypt.compare(password,checkExistingUser.password)
-        if(!isMatch){
-            return res.status(400).json({error: "Insert proper password!!!"})
+        const isMatch = await bcrypt.compare(password, checkExistingUser.password)
+        if (!isMatch) {
+            return res.status(400).json({ error: "Insert proper password!!!" })
         }
-    
+
         // generate Token
 
         const token = jwt.sign(
             { id: checkExistingUser.userId, email: checkExistingUser.email },
-            process.env.JWT_SECRET,  
+            process.env.JWT_SECRET,
             { expiresIn: "24h" }
         );
 
         res.status(200).json({ message: "Successfully logged in", token });
-        
-    } 
+
+    }
 
     catch (error) {
-        res.status(500).json({error: "Something went wrong!"});
+        res.status(500).json({ error: "Something went wrong!" });
     }
 
 
 };
 
 
+const forgotPassword = async (req, res) => {
+    const { email } = req.body;
+    // validate username, password 
+    if (!email) {
+        return res.status(400).json({
+            error: "Please, enter email and password"
+        });
 
+    }
+
+    try {
+
+    }
+    catch (error) {
+        console.log("Error registering user:", error);
+        res.status(200).json({ error: "Something went wrong!" });
+    }
+}
 
 const getUserByTd = async (req, res) => {
-    const { id } = req.params; 
+    const { id } = req.params;
 
     try {
         const user = await userModel.findOne({ where: { userId: id } });
@@ -105,26 +124,27 @@ const getUserByTd = async (req, res) => {
             return res.status(404).json({ error: "User not found!" });
         }
         res.status(200).json(user);
-    } catch (error) {
+    }
+    catch (error) {
         res.status(500).json({ error: "Failed to retrieve user data" });
     }
 };
 
 
 
-const getAllUsers = async(req, res) => {
+const getAllUsers = async (req, res) => {
     try {
         const users = await userModel.findAll();
         res.status(200).json(users);
         console.log("Retrieve all users");
-        
-    } 
+
+    }
     catch (error) {
-        res.status(500).json({error: "Failed to retrive user data"})
+        res.status(500).json({ error: "Failed to retrive user data" })
     }
 };
 
 
 
 
-module.exports = {registerUser, loginUser, getUserByTd, getAllUsers};
+module.exports = { registerUser, loginUser, getUserByTd, getAllUsers };

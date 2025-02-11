@@ -3,7 +3,7 @@ const {DataTypes} = require("sequelize");
 const {sequelize} = require("../database/Database");
 
 const User = sequelize.define("User", {
-    userId: {
+    id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
@@ -18,9 +18,9 @@ const User = sequelize.define("User", {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true,
-        // validate: {
-        //     isEmail: true, 
-        // },
+        validate: {
+            isEmail: true, 
+        },
     },
 
     phoneNumber: {
@@ -34,9 +34,9 @@ const User = sequelize.define("User", {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        // validate: {
-        //     len: [8, 100], 
-        // },
+        validate: {
+            len: [8, 100], 
+        },
     },
 
     profilePicture: {
