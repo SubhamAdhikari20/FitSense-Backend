@@ -1,7 +1,9 @@
 const userModel = require("../models/UserModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-
+const { createError } = require("./../error");
+const dotenv = require("dotenv");
+dotenv.config();
 
 
 const registerUser = async (req, res) => {
@@ -21,11 +23,11 @@ const registerUser = async (req, res) => {
         console.log(fullName, email, phoneNumber);
         const checkExistingUser = await userModel.findOne({ where: { email } });
         if (checkExistingUser) {
-            return res.status(400).json({ error: "Email already exist!" })
+            return res.status(409).json({ error: "Email already exist!" })
         }
 
         // Hash the password
-        const saltRound = 10;
+        const saltRound = bcrypt.genSaltSync(10);
         const hashedPassword = await bcrypt.hash(password, saltRound);
 
         // Create new User
@@ -35,6 +37,7 @@ const registerUser = async (req, res) => {
             phoneNumber,
             password: hashedPassword
         });
+
 
         // console.log(newUser)
         res.status(200).json({ message: "User registered successfully!", user: newUser });
@@ -63,7 +66,6 @@ const loginUser = async (req, res) => {
 
     try {
         // Check existing user
-
         const checkExistingUser = await userModel.findOne({ where: { email } });
         if (!checkExistingUser) {
             return res.status(400).json({ error: "User does not exist!" })
@@ -73,13 +75,12 @@ const loginUser = async (req, res) => {
         //Verify User
         const isMatch = await bcrypt.compare(password, checkExistingUser.password)
         if (!isMatch) {
-            return res.status(400).json({ error: "Insert proper password!!!" })
+            return res.status(400).json({ error: "Incorrect password!!!" })
         }
 
         // generate Token
-
         const token = jwt.sign(
-            { id: checkExistingUser.userId, email: checkExistingUser.email },
+            { id: checkExistingUser.id, email: checkExistingUser.email },
             process.env.JWT_SECRET,
             { expiresIn: "24h" }
         );
@@ -119,7 +120,7 @@ const getUserByTd = async (req, res) => {
     const { id } = req.params;
 
     try {
-        const user = await userModel.findOne({ where: { userId: id } });
+        const user = await userModel.findOne({ where: { id } });
         if (!user) {
             return res.status(404).json({ error: "User not found!" });
         }
@@ -129,7 +130,6 @@ const getUserByTd = async (req, res) => {
         res.status(500).json({ error: "Failed to retrieve user data" });
     }
 };
-
 
 
 const getAllUsers = async (req, res) => {
@@ -146,5 +146,21 @@ const getAllUsers = async (req, res) => {
 
 
 
+const getUserDashboard = async (req, res, next) => {
+    try {
+        const id = req.user?.id;
+        const user = await userModel.findOne({ where: { id } });
+        if (!user) {
+            return next(createError(404, "User not found"));
+        }
 
-module.exports = { registerUser, loginUser, getUserByTd, getAllUsers };
+    } 
+    
+    catch (err) {
+        next(err);
+    }
+}
+
+
+
+module.exports = { registerUser, loginUser, getUserByTd, getAllUsers, getUserDashboard };
