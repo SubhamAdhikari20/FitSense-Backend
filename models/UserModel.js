@@ -1,5 +1,5 @@
-const {DataTypes} = require("sequelize");
-const {sequelize} = require("../database/Database");
+const { DataTypes } = require("sequelize");
+const { sequelize } = require("../database/Database");
 
 const User = sequelize.define("User", {
     id: {
@@ -18,7 +18,7 @@ const User = sequelize.define("User", {
         allowNull: false,
         unique: true,
         validate: {
-            isEmail: true, 
+            isEmail: true,
         },
     },
 
@@ -34,7 +34,7 @@ const User = sequelize.define("User", {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            len: [8, 100], 
+            len: [8, 100],
         },
     },
 
@@ -43,6 +43,9 @@ const User = sequelize.define("User", {
         allowNull: true,
     },
 
+}, {
+    tableName: "User",  // Explicitly specify the table name with correct case
+    timestamps: true,   // This ensures Sequelize uses 'createdAt' and 'updatedAt'
 });
 
 

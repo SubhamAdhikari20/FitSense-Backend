@@ -10,7 +10,7 @@ const authGuard = async (req, res, next) => {
         if (!authHeader) {
             return res.status(401).json({
                 success: false,
-                message: 'User not authorized!',
+                error: 'User not authorized!',
             });
         }
 
@@ -19,7 +19,7 @@ const authGuard = async (req, res, next) => {
         if (!token || token === '') {
             return res.status(401).json({
                 success: false,
-                message: 'No token in header!',
+                error: 'No token in header!',
             });
         }
 
@@ -30,7 +30,8 @@ const authGuard = async (req, res, next) => {
     }
 
     catch (error) {
-        next();
+        console.error(error);
+        return res.status(401).json({ error: "Invalid Token!"});
     }
 
 };

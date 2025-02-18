@@ -15,7 +15,12 @@ const trainerRoute = require("./routes/TrainerRoute");
 const app = express();
 
 // Creating a middleware
-app.use(cors());
+// app.use(cors());
+// Creating a middleware with specific origin and credentials
+app.use(cors({
+    origin: "http://localhost:5173",  
+    credentials: true
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -27,11 +32,19 @@ app.use("/api/user", userRoute);
 app.use("/api/trainer", trainerRoute);
 
 
+// app.get("/api", async (req, res) => {
+//     res.status(200).json({
+//         message: "Hello! World",
+//     });
+// });
+
 app.get("/api", async (req, res) => {
-    res.status(200).json({
-        message: "Hello! World",
-    });
+    res.send(
+        `<div>
+            <h2>Welcome to Subham Adhikari</h2>
+        </div>`);
 });
+
 
 // Creating a port 
 const PORT = process.env.SERVER_PORT
