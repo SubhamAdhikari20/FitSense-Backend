@@ -51,15 +51,14 @@ const registerUser = async (req, res) => {
             password: hashedPassword
         });
 
-        // generate Token
+        // Generate Token
         const token = jwt.sign(
             { id: newUser.id, email: newUser.email },
             process.env.JWT_SECRET,
             { expiresIn: "9999 years" }
         );
 
-
-        return res.status(201).json({ message: "User registered successfully!", token: token, user: newUser});
+        return res.status(201).json({ message: "User registered successfully!", token: token, user: newUser });
 
     }
     catch (error) {
@@ -75,7 +74,7 @@ const registerUser = async (req, res) => {
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
 
-    // validate username, password 
+    // validate user, password 
     if (!email || !password) {
         return res.status(400).json({
             error: "Please, enter email and password"
@@ -91,13 +90,13 @@ const loginUser = async (req, res) => {
         }
 
 
-        //Verify User
+        //Verify User with bcrypt
         const isMatch = await bcrypt.compare(password, checkExistingUser.password)
         if (!isMatch) {
             return res.status(400).json({ error: "Incorrect password!!!" })
         }
 
-        // generate Token
+        // Generate Token
         const token = jwt.sign(
             { id: checkExistingUser.id, email: checkExistingUser.email },
             process.env.JWT_SECRET,
@@ -109,7 +108,7 @@ const loginUser = async (req, res) => {
     }
 
     catch (error) {
-        return res.status(500).json({ error: "Something went wrong!" });
+        return res.status(500).json({ error: "Internal server error!" });
     }
 
 
@@ -117,19 +116,32 @@ const loginUser = async (req, res) => {
 
 
 const forgotPassword = async (req, res) => {
-    const { email } = req.body;
-    // validate username, password 
-    if (!email) {
-        return res.status(400).json({ error: "Please, enter email and password"});
+    const { email, newPassword } = req.body;
 
+    // validate email, password 
+    if (!email || !newPassword) {
+        return res.status(400).json({ error: "Please, enter email and new password" });
     }
 
     try {
+        // Check existing user
+        const checkExistingUser = await userModel.findOne({ where: { email } });
+        if (!checkExistingUser) {
+            return res.status(400).json({ error: "Email does not match!" })
+        }
 
+        // Hash the newPassword
+        const saltRound = bcrypt.genSaltSync(10);
+        const hashedPassword = await bcrypt.hash(newPassword, saltRound);
+
+        // Reset Password
+        await checkExistingUser.update({ password: hashedPassword });
+
+        return res.status(200).json({ message: "Password reset successfully", user: checkExistingUser });
     }
     catch (error) {
-        console.log("Error registering user:", error);
-        return res.status(200).json({ error: "Something went wrong!" });
+        console.log("Error while reseting password", error);
+        return res.status(500).json({ error: "Internal server error!" });
     }
 }
 
@@ -141,7 +153,7 @@ const getUserByTd = async (req, res) => {
         if (!user) {
             return res.status(404).json({ error: "User not found!" });
         }
-        
+
         return res.status(200).json({ user: user });
     }
     catch (error) {
@@ -180,4 +192,4 @@ const getUserDashboard = async (req, res, next) => {
 
 
 
-module.exports = { registerUser, loginUser, getUserByTd, getAllUsers, getUserDashboard };
+module.exports = { registerUser, loginUser, forgotPassword, getUserByTd, getAllUsers, getUserDashboard };
