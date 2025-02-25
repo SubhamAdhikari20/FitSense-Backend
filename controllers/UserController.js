@@ -145,11 +145,52 @@ const forgotPassword = async (req, res) => {
     }
 }
 
-const getUserByTd = async (req, res) => {
-    const { id } = req.user;
+const uploadImage = async (req, res) => {
+    const { email } = req.body;
+    const profilePicture = req.file ? req.file.path : null;
 
     try {
-        const user = await userModel.findOne({ where: { id } });
+        // Check existing user
+        const user = await userModel.findOne({ where: { email } });
+        if (!user) {
+            return res.status(400).json({ error: "Email does not match!" })
+        }
+
+        await user.update({ profilePicture });
+
+        return res.status(201).json({ message: "Profile Picture updated successfully!", profilePicture });
+    }
+    catch (error) {
+        // console.log(fullName, email, phoneNumber);
+        console.log("Error registering user:", error);
+        return res.status(500).json({ error: "Internal server error!" });
+    }
+
+}
+
+const deleteUserByEmail= async (req, res) => {
+    const { email } = req.user;
+
+    try {
+        const user = await userModel.findOne({ where: { email } });
+        if (!user) {
+            return res.status(404).json({ error: "User not found!" });
+        }
+
+        // Delete the user record
+        await user.destroy();
+        return res.status(200).json({ message: "Account deleted successfully!"});
+    }
+    catch (error) {
+        return res.status(500).json({ error: "Failed to retrieve user data" });
+    }
+}
+
+const getUserByEmail = async (req, res) => {
+    const { email } = req.user;
+
+    try {
+        const user = await userModel.findOne({ where: { email } });
         if (!user) {
             return res.status(404).json({ error: "User not found!" });
         }
@@ -192,4 +233,4 @@ const getUserDashboard = async (req, res, next) => {
 
 
 
-module.exports = { registerUser, loginUser, forgotPassword, getUserByTd, getAllUsers, getUserDashboard };
+module.exports = { registerUser, loginUser, forgotPassword, uploadImage, deleteUserByEmail, getUserByEmail, getAllUsers, getUserDashboard };
