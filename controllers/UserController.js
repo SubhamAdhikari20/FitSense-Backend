@@ -48,7 +48,8 @@ const registerUser = async (req, res) => {
             fullName,
             email,
             phoneNumber,
-            password: hashedPassword
+            password: hashedPassword,
+            role: "user"
         });
 
         // Generate Token
@@ -103,7 +104,7 @@ const loginUser = async (req, res) => {
             { expiresIn: "24h" }
         );
 
-        return res.status(200).json({ message: "Successfully logged in", token: token, user: checkExistingUser });
+        return res.status(200).json({ message: "Successfully logged as User", token: token, user: { ...checkExistingUser.dataValues, role: "user" } });
 
     }
 
@@ -187,7 +188,7 @@ const deleteUserByEmail= async (req, res) => {
 }
 
 const getUserByEmail = async (req, res) => {
-    const { email } = req.user;
+    const { email } = req.query;
 
     try {
         const user = await userModel.findOne({ where: { email } });

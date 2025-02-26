@@ -10,7 +10,7 @@ router.post("/forgot_password", forgotPassword);
 router.post("/profile_picture", upload.single("profilePicture"), uploadImage);
 
 router.delete("/delete_user", authGuard, deleteUserByEmail);
-router.get("/view_user_by_email", authGuard, getUserByEmail);
+router.get("/view_user_by_email", getUserByEmail);
 router.get("/dashboard", authGuard, getUserDashboard);
 
 

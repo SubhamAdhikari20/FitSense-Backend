@@ -1,17 +1,17 @@
 const express = require("express");
 const router = express.Router();
+const { authGuard } = require("./../middleware/AuthGuard");
+const upload = require('./../middleware/UploadImage');
+const { registerTrainer, loginTrainer, forgotPassword, uploadImage, deleteTrainerByEmail, getTrainerByEmail } = require("./../controllers/TrainerController")
 
-// Import TrainerController
-const trainerController = require("../controllers/TrainerController");
-// const uploadImage = require("./middleware/UploadImage");
+router.post("/register_trainer", registerTrainer);
+router.post("/login_trainer", loginTrainer);
+router.post("/forgot_password", forgotPassword);
+router.post("/profile_picture", upload.single("profilePicture"), uploadImage);
 
+router.delete("/delete_trainer", authGuard, deleteTrainerByEmail);
+router.get("/view_trainer_by_email", getTrainerByEmail);
 
-router.post("/register_trainer", trainerController.registerTrainer);
-router.post("/login_trainer", trainerController.loginTrainer);
-// router.get("/view_trainer_by_id", trainerController.getTrainerById);
-// router.get("/view_all_trainers", trainerController.getAllTrainers);
-// router.put("/update_trainer", trainerController.updateTrainer);
-// router.delete("/delete_trainer", trainerController.deleteTrainer);
 
 // Export the route
 module.exports = router;

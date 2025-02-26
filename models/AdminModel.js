@@ -1,8 +1,7 @@
 const { DataTypes } = require("sequelize");
+const { sequelize } = require("../database/Database");
 
-const {sequelize} = require("../database/Database");
-
-const Trainer = sequelize.define("Trainer", {
+const Admin = sequelize.define("Admin", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -19,7 +18,7 @@ const Trainer = sequelize.define("Trainer", {
         allowNull: false,
         unique: true,
         validate: {
-            isEmail: true, 
+            isEmail: true,
         },
     },
 
@@ -31,19 +30,11 @@ const Trainer = sequelize.define("Trainer", {
         // },
     },
 
-    experience: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            len: [0, 2], 
-        },
-    },
-
     password: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-            len: [8, 100], 
+            len: [8, 100],
         },
     },
 
@@ -57,9 +48,10 @@ const Trainer = sequelize.define("Trainer", {
         allowNull: false,
     },
 }, {
-    tableName: "Trainer",   
-    timestamps: true,       
+    tableName: "Admin",  // Explicitly specify the table name with correct case
+    timestamps: true,   // This ensures Sequelize uses 'createdAt' and 'updatedAt'
 });
 
 
-module.exports = Trainer;
+module.exports = Admin;
+

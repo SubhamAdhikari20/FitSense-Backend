@@ -43,6 +43,11 @@ const User = sequelize.define("User", {
         allowNull: true,
     },
 
+    role: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+
 }, {
     tableName: "User",  // Explicitly specify the table name with correct case
     timestamps: true,   // This ensures Sequelize uses 'createdAt' and 'updatedAt'

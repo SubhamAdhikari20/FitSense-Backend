@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const { databaseConnection } = require("./database/Database");
 const userRoute = require("./routes/UserRoute");
 const trainerRoute = require("./routes/TrainerRoute");
+const adminRoute = require("./routes/AdminRoute");
 
 
 // Creating a server 
@@ -18,7 +19,7 @@ const app = express();
 // app.use(cors());
 // Creating a middleware with specific origin and credentials
 app.use(cors({
-    origin: "http://localhost:5173",  
+    origin: "http://localhost:5173",
     credentials: true
 }));
 app.use(bodyParser.json());
@@ -30,6 +31,12 @@ app.use("/api/user", userRoute);
 
 // Trainer Route
 app.use("/api/trainer", trainerRoute);
+
+// Admin Route
+app.use("/api/admin", adminRoute);
+
+// Unified Logging
+// app.use("/api/unified_logging" );
 
 
 // app.get("/api", async (req, res) => {
