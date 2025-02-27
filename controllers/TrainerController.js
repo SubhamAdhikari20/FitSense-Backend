@@ -29,10 +29,6 @@ const registerTrainer = async (req, res) => {
         return res.status(400).json({ error: "Nepali numbers must be 10 digits!" });
     }
 
-    if (experience.length !== 2) {
-        return res.status(400).json({ error: "Experience must be 2 digits!" });
-    }
-
     if (password.length < 8) {
         return res.status(400).json({ error: "Password must be at least 8 characters!" });
     }
@@ -185,7 +181,7 @@ const deleteTrainerByEmail= async (req, res) => {
 
         // Delete the trainer record
         await trainer.destroy();
-        return res.status(200).json({ message: "Account deleted successfully!"});
+        return res.status(200).json({ message: "Trainer Account deleted successfully!"});
     }
     catch (error) {
         return res.status(500).json({ error: "Failed to retrieve trainer data" });
@@ -215,9 +211,7 @@ const getTrainerByEmail = async (req, res) => {
 const getAllTrainers = async (req, res) => {
     try {
         const trainers = await trainerModel.findAll();
-        res.status(200).json(trainers);
-        console.log("Retrieve all trainers");
-
+        return res.status(200).json({ getAllTrainers: trainers });
     }
     catch (error) {
         res.status(500).json({ error: "Failed to retrive trainer data" })

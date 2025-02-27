@@ -149,7 +149,7 @@ const forgotPassword = async (req, res) => {
 const uploadImage = async (req, res) => {
     const { email } = req.body;
     const profilePicture = req.file ? req.file.path : null;
-
+ 
     try {
         // Check existing user
         const user = await userModel.findOne({ where: { email } });
@@ -204,7 +204,7 @@ const getUserByEmail = async (req, res) => {
 };
 
 
-const getAllUsers = async (req, res) => {
+const getAllUsers = async (res) => {
     try {
         const users = await userModel.findAll();
         return res.status(200).json({ users: users });
