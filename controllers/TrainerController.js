@@ -170,11 +170,11 @@ const uploadImage = async (req, res) => {
 
 }
 
-const deleteTrainerByEmail= async (req, res) => {
-    const { email } = req.trainer;
+const deleteTrainer= async (req, res) => {
+    const { id } = req.params;
 
     try {
-        const trainer = await trainerModel.findOne({ where: { email } });
+        const trainer = await trainerModel.findOne({ where: { id } });
         if (!trainer) {
             return res.status(404).json({ error: "Trainer not found!" });
         }
@@ -210,8 +210,14 @@ const getTrainerByEmail = async (req, res) => {
 
 const getAllTrainers = async (req, res) => {
     try {
+        const userId = req.user.id;
+
+        if (!userId) {
+            return res.status(401).json({ error: "Unauthorized user" });
+        }
+
         const trainers = await trainerModel.findAll();
-        return res.status(200).json({ getAllTrainers: trainers });
+        return res.status(200).json({ trainers });
     }
     catch (error) {
         res.status(500).json({ error: "Failed to retrive trainer data" })
@@ -221,4 +227,4 @@ const getAllTrainers = async (req, res) => {
 
 
 
-module.exports = { registerTrainer, loginTrainer, forgotPassword, uploadImage, deleteTrainerByEmail, getTrainerByEmail, getAllTrainers };
+module.exports = { registerTrainer, loginTrainer, forgotPassword, uploadImage, deleteTrainer, getTrainerByEmail, getAllTrainers };

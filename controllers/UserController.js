@@ -56,7 +56,7 @@ const registerUser = async (req, res) => {
         const token = jwt.sign(
             { id: newUser.id, email: newUser.email },
             process.env.JWT_SECRET,
-            { expiresIn: "9999 years" }
+            { expiresIn: `${process.env.JWT_SIGNUP_EXPIRES_IN}` }
         );
 
         return res.status(201).json({ message: "User registered successfully!", token: token, user: newUser });
@@ -101,7 +101,7 @@ const loginUser = async (req, res) => {
         const token = jwt.sign(
             { id: checkExistingUser.id, email: checkExistingUser.email },
             process.env.JWT_SECRET,
-            { expiresIn: "24h" }
+            { expiresIn: `${process.env.JWT_LOGIN_EXPIRES_IN}` }
         );
 
         return res.status(200).json({ message: "Successfully logged as User", token: token, user: { ...checkExistingUser.dataValues, role: "user" } });
@@ -147,14 +147,14 @@ const forgotPassword = async (req, res) => {
 }
 
 const uploadImage = async (req, res) => {
-    const { email } = req.body;
+    const { id } = req.body;
     const profilePicture = req.file ? req.file.path : null;
  
     try {
         // Check existing user
-        const user = await userModel.findOne({ where: { email } });
+        const user = await userModel.findOne({ where: { id } });
         if (!user) {
-            return res.status(400).json({ error: "Email does not match!" })
+            return res.status(400).json({ error: "User Id does not match!" })
         }
 
         await user.update({ profilePicture });
@@ -169,14 +169,16 @@ const uploadImage = async (req, res) => {
 
 }
 
-const deleteUserByEmail= async (req, res) => {
-    const { email } = req.user;
+const deleteUser= async (req, res) => {
+    const { id } = req.user;
+    console.log(typeof id);
 
     try {
-        const user = await userModel.findOne({ where: { email } });
+        const user = await userModel.findOne({ where: { id } });
         if (!user) {
             return res.status(404).json({ error: "User not found!" });
         }
+        console.log(user);
 
         // Delete the user record
         await user.destroy();
@@ -234,4 +236,4 @@ const getUserDashboard = async (req, res, next) => {
 
 
 
-module.exports = { registerUser, loginUser, forgotPassword, uploadImage, deleteUserByEmail, getUserByEmail, getAllUsers, getUserDashboard };
+module.exports = { registerUser, loginUser, forgotPassword, uploadImage, deleteUser, getUserByEmail, getAllUsers, getUserDashboard };

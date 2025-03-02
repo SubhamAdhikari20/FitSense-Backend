@@ -10,6 +10,7 @@ const { databaseConnection } = require("./database/Database");
 const userRoute = require("./routes/UserRoute");
 const trainerRoute = require("./routes/TrainerRoute");
 const adminRoute = require("./routes/AdminRoute");
+const workoutRoute = require("./routes/WorkoutRoute");
 
 
 // Creating a server 
@@ -34,6 +35,9 @@ app.use("/api/trainer", trainerRoute);
 
 // Admin Route
 app.use("/api/admin", adminRoute);
+
+// Workout Route
+app.use("/api/user/workout", workoutRoute);
 
 // Unified Logging
 // app.use("/api/unified_logging" );

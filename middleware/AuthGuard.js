@@ -4,7 +4,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const authGuard = async (req, res, next) => {
-    console.log(req.headers);
+    // console.log(req.headers);
     const authHeader = req.headers.authorization;
     try {
         if (!authHeader) {
@@ -25,8 +25,10 @@ const authGuard = async (req, res, next) => {
 
         const decodedUser = jwt.verify(token, process.env.JWT_SECRET);
         req.user = decodedUser;
+        // req.trainer = decodedUser;
 
-        return next();
+        // return req.user;
+        next();
     }
 
     catch (error) {
