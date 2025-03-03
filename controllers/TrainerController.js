@@ -148,30 +148,69 @@ const forgotPassword = async (req, res) => {
 }
 
 const uploadImage = async (req, res) => {
-    const { email } = req.body;
+    const { id } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     try {
-        // Check existing trainer
-        const trainer = await trainerModel.findOne({ where: { email } });
-        if (!trainer) {
-            return res.status(400).json({ error: "Email does not match!" })
+        // Check existing user
+        const user = await trainerModel.findOne({ where: { id } });
+        if (!user) {
+            return res.status(400).json({ error: "Trainer Id does not match!" })
         }
 
-        await trainer.update({ profilePicture });
+        await user.update({ profilePicture });
 
-        return res.status(201).json({ message: "Profile Picture updated successfully!", profilePicture });
+        return res.status(201).json({ message: "Trainer Profile Picture updated successfully!", profilePicture });
     }
     catch (error) {
         // console.log(fullName, email, phoneNumber);
-        console.log("Error registering trainer:", error);
+        console.log("Error registering user:", error);
         return res.status(500).json({ error: "Internal server error!" });
     }
 
 }
 
-const deleteTrainer= async (req, res) => {
+
+const updateTrainerProfileDetails = async (req, res) => {
     const { id } = req.params;
+    const { fullName, email, phoneNumber, experience, gender, age, weight, height_ft, height_in } = req.body;
+
+    try {
+        const trainer = await trainerModel.findOne({ where: { id } });
+        if (!trainer) return res.status(404).json({ error: "User not found!" });
+
+        // Validate numerical fields
+        if (isNaN(weight) || isNaN(height_ft) || isNaN(height_in)) {
+            return res.status(400).json({ error: "Invalid weight or height values." });
+        }
+
+        // Convert height to meters and calculate BMI
+        const heightMeters = (parseFloat(height_ft) * 0.3048) + (parseFloat(height_in) * 0.0254);
+        const bmi = parseFloat(weight) / (heightMeters ** 2);
+        const roundedBMI = parseFloat(bmi.toFixed(2));
+
+        // Update user with BMI
+        await trainer.update({
+            fullName, email, phoneNumber, experience, gender, age,
+            weight: parseFloat(weight),
+            height_ft: parseFloat(height_ft),
+            height_in: parseFloat(height_in),
+            bmi: roundedBMI
+        });
+
+        return res.status(200).json({
+            message: "Trainer Profile Details updated successfully!",
+            user: trainer
+        });
+    } catch (error) {
+        console.error("Update error:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+};
+
+
+const deleteTrainer= async (req, res) => {
+    const { id } = req.user;
 
     try {
         const trainer = await trainerModel.findOne({ where: { id } });
@@ -210,12 +249,6 @@ const getTrainerByEmail = async (req, res) => {
 
 const getAllTrainers = async (req, res) => {
     try {
-        const userId = req.user.id;
-
-        if (!userId) {
-            return res.status(401).json({ error: "Unauthorized user" });
-        }
-
         const trainers = await trainerModel.findAll();
         return res.status(200).json({ trainers });
     }
@@ -226,5 +259,4 @@ const getAllTrainers = async (req, res) => {
 
 
 
-
-module.exports = { registerTrainer, loginTrainer, forgotPassword, uploadImage, deleteTrainer, getTrainerByEmail, getAllTrainers };
+module.exports = { registerTrainer, loginTrainer, forgotPassword, uploadImage, updateTrainerProfileDetails, deleteTrainer, getTrainerByEmail, getAllTrainers };

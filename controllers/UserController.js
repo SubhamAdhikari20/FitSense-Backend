@@ -149,7 +149,7 @@ const forgotPassword = async (req, res) => {
 const uploadImage = async (req, res) => {
     const { id } = req.body;
     const profilePicture = req.file ? req.file.path : null;
- 
+
     try {
         // Check existing user
         const user = await userModel.findOne({ where: { id } });
@@ -159,7 +159,7 @@ const uploadImage = async (req, res) => {
 
         await user.update({ profilePicture });
 
-        return res.status(201).json({ message: "Profile Picture updated successfully!", profilePicture });
+        return res.status(201).json({ message: "User Profile Picture updated successfully!", profilePicture });
     }
     catch (error) {
         // console.log(fullName, email, phoneNumber);
@@ -169,9 +169,47 @@ const uploadImage = async (req, res) => {
 
 }
 
-const deleteUser= async (req, res) => {
+
+const updateProfileDetails = async (req, res) => {
+    const { id } = req.params;
+    const { fullName, email, phoneNumber, gender, age, weight, height_ft, height_in } = req.body;
+
+    try {
+        const user = await userModel.findOne({ where: { id } });
+        if (!user) return res.status(404).json({ error: "User not found!" });
+
+        // Validate numerical fields
+        if (isNaN(weight) || isNaN(height_ft) || isNaN(height_in)) {
+            return res.status(400).json({ error: "Invalid weight or height values." });
+        }
+
+        // Convert height to meters and calculate BMI
+        const heightMeters = (parseFloat(height_ft) * 0.3048) + (parseFloat(height_in) * 0.0254);
+        const bmi = parseFloat(weight) / (heightMeters ** 2);
+        const roundedBMI = parseFloat(bmi.toFixed(2));
+
+        // Update user with BMI
+        await user.update({
+            fullName, email, phoneNumber, gender, age,
+            weight: parseFloat(weight),
+            height_ft: parseFloat(height_ft),
+            height_in: parseFloat(height_in),
+            bmi: roundedBMI
+        });
+
+        return res.status(200).json({
+            message: "Profile updated successfully!",
+            user: user
+        });
+    } catch (error) {
+        console.error("Update error:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+};
+
+
+const deleteUser = async (req, res) => {
     const { id } = req.user;
-    console.log(typeof id);
 
     try {
         const user = await userModel.findOne({ where: { id } });
@@ -182,7 +220,7 @@ const deleteUser= async (req, res) => {
 
         // Delete the user record
         await user.destroy();
-        return res.status(200).json({ message: "Account deleted successfully!"});
+        return res.status(200).json({ message: "User Account deleted successfully!" });
     }
     catch (error) {
         return res.status(500).json({ error: "Failed to retrieve user data" });
@@ -236,4 +274,4 @@ const getUserDashboard = async (req, res, next) => {
 
 
 
-module.exports = { registerUser, loginUser, forgotPassword, uploadImage, deleteUser, getUserByEmail, getAllUsers, getUserDashboard };
+module.exports = { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserByEmail, getAllUsers, getUserDashboard };

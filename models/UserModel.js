@@ -43,6 +43,36 @@ const User = sequelize.define("User", {
         allowNull: true,
     },
 
+    gender: {
+        type: DataTypes.STRING,
+        allowNull: true,
+    },
+
+    age: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+
+    weight: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+    },
+
+    height_ft: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+
+    height_in: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+    },
+
+    bmi: {
+        type: DataTypes.DECIMAL,
+        allowNull: true,
+    },
+
     role: {
         type: DataTypes.STRING,
         allowNull: false,

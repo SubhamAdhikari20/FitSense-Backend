@@ -83,43 +83,83 @@ const forgotPassword = async (req, res) => {
 }
 
 const uploadImage = async (req, res) => {
-    const { email } = req.body;
+    const { id } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     try {
-        // Check existing admin
-        const admin = await adminModel.findOne({ where: { email } });
+        // Check existing user
+        const admin = await adminModel.findOne({ where: { id } });
         if (!admin) {
-            return res.status(400).json({ error: "Email does not match!" })
+            return res.status(400).json({ error: "admin Id does not match!" })
         }
 
         await admin.update({ profilePicture });
 
-        return res.status(201).json({ message: "Profile Picture updated successfully!", profilePicture });
+        return res.status(201).json({ message: "admin Profile Picture updated successfully!", profilePicture });
     }
     catch (error) {
         // console.log(fullName, email, phoneNumber);
-        console.log("Error registering admin:", error);
+        console.log("Error registering user:", error);
         return res.status(500).json({ error: "Internal server error!" });
     }
 
 }
 
-const deleteAdminByEmail= async (req, res) => {
-    const { email } = req.admin;
+
+const updateAdminProfileDetails = async (req, res) => {
+    const { id } = req.params;
+    const { fullName, email, phoneNumber, gender, age, weight, height_ft, height_in } = req.body;
 
     try {
-        const admin = await adminModel.findOne({ where: { email } });
+        const admin = await adminModel.findOne({ where: { id } });
+        if (!admin) return res.status(404).json({ error: "User not found!" });
+
+        // Validate numerical fields
+        if (isNaN(weight) || isNaN(height_ft) || isNaN(height_in)) {
+            return res.status(400).json({ error: "Invalid weight or height values." });
+        }
+
+        // Convert height to meters and calculate BMI
+        const heightMeters = (parseFloat(height_ft) * 0.3048) + (parseFloat(height_in) * 0.0254);
+        const bmi = parseFloat(weight) / (heightMeters ** 2);
+        const roundedBMI = parseFloat(bmi.toFixed(2));
+
+        // Update admin with BMI
+        await admin.update({
+            fullName, email, phoneNumber, gender, age,
+            weight: parseFloat(weight),
+            height_ft: parseFloat(height_ft),
+            height_in: parseFloat(height_in),
+            bmi: roundedBMI
+        });
+
+        return res.status(200).json({
+            message: "Admin Profile updated successfully!",
+            user: admin
+        });
+    } catch (error) {
+        console.error("Update error:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+};
+
+
+const deleteAdmin = async (req, res) => {
+    const { id } = req.user;
+
+    try {
+        const admin = await adminModel.findOne({ where: { id } });
         if (!admin) {
             return res.status(404).json({ error: "Admin not found!" });
         }
+        console.log(user);
 
-        // Delete the admin record
-        await admin.destroy();
-        return res.status(200).json({ message: "Account deleted successfully!"});
+        // Delete the user record
+        await adminModel.destroy();
+        return res.status(200).json({ message: "Admin Account deleted successfully!" });
     }
     catch (error) {
-        return res.status(500).json({ error: "Failed to retrieve admin data" });
+        return res.status(500).json({ error: "Failed to retrieve user data" });
     }
 }
 
@@ -171,4 +211,4 @@ const getAdminDashboard = async (req, res, next) => {
 
 
 
-module.exports = { loginAdmin, forgotPassword, uploadImage, deleteAdminByEmail, getAdminByEmail, getAllAdmins, getAdminDashboard };
+module.exports = { loginAdmin, forgotPassword, uploadImage, updateAdminProfileDetails, deleteAdmin, getAdminByEmail, getAllAdmins, getAdminDashboard };
