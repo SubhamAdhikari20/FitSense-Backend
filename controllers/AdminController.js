@@ -1,4 +1,5 @@
 const adminModel = require("../models/AdminModel");
+const trainerModel = require("../models/TrainerModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { createError } = require("./../error");
@@ -145,23 +146,50 @@ const updateAdminProfileDetails = async (req, res) => {
 
 
 const deleteAdmin = async (req, res) => {
-    const { id } = req.user;
+    const { id } = req.body;
 
     try {
         const admin = await adminModel.findOne({ where: { id } });
         if (!admin) {
             return res.status(404).json({ error: "Admin not found!" });
         }
-        console.log(user);
 
         // Delete the user record
-        await adminModel.destroy();
+        await admin.destroy();
         return res.status(200).json({ message: "Admin Account deleted successfully!" });
     }
     catch (error) {
-        return res.status(500).json({ error: "Failed to retrieve user data" });
+        return res.status(500).json({ error: "Failed to delete admin account" });
     }
 }
+
+const deleteTrainerByAdmin= async (req, res) => {
+    const { id } = req.body;
+
+    try {
+        const trainer = await trainerModel.findOne({ where: { id } });
+        if (!trainer) {
+            return res.status(404).json({ error: "Trainer not found!" });
+        }
+
+        // Delete the trainer record
+        await trainer.destroy();
+        return res.status(200).json({ message: "Trainer Account deleted successfully!"});
+    }
+    catch (error) {
+        return res.status(500).json({ error: "Failed to delete trainer account" });
+    }
+}
+
+const getAllTrainersByAdmin = async (req, res) => {
+    try {
+        const trainers = await trainerModel.findAll();
+        return res.status(200).json({ trainers });
+    }
+    catch (error) {
+        res.status(500).json({ error: "Failed to retrive trainer data" })
+    }
+};
 
 const getAdminByEmail = async (req, res) => {
     const { email } = req.query;
@@ -211,4 +239,4 @@ const getAdminDashboard = async (req, res, next) => {
 
 
 
-module.exports = { loginAdmin, forgotPassword, uploadImage, updateAdminProfileDetails, deleteAdmin, getAdminByEmail, getAllAdmins, getAdminDashboard };
+module.exports = { loginAdmin, forgotPassword, uploadImage, updateAdminProfileDetails, deleteAdmin, deleteTrainerByAdmin, getAllTrainersByAdmin, getAdminByEmail, getAllAdmins, getAdminDashboard };

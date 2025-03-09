@@ -1,6 +1,6 @@
 // tests/UserModel.test.js
 const SequelizeMock = require("sequelize-mock");
-const { hashPassword } = require("../utils/bcryptUtils");
+const { hashPassword } = require("../../utils/bcryptUtils");
 const sequelizeMock = new SequelizeMock();
 
 // Define a mock User model

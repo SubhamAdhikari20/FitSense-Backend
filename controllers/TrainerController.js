@@ -210,7 +210,7 @@ const updateTrainerProfileDetails = async (req, res) => {
 
 
 const deleteTrainer= async (req, res) => {
-    const { id } = req.user;
+    const { id } = req.body;
 
     try {
         const trainer = await trainerModel.findOne({ where: { id } });
@@ -223,7 +223,7 @@ const deleteTrainer= async (req, res) => {
         return res.status(200).json({ message: "Trainer Account deleted successfully!"});
     }
     catch (error) {
-        return res.status(500).json({ error: "Failed to retrieve trainer data" });
+        return res.status(500).json({ error: "Failed to delete trainer account" });
     }
 }
 

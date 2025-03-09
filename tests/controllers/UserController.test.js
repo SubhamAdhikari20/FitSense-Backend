@@ -1,7 +1,7 @@
 // tests/userController.test.js
-const { registerUser, loginUser, forgotPassword, deleteUserByEmail, getUserByEmail } = require("../controllers/UserController");
-const User = require("../models/UserModel");
-const { generateToken } = require("../utils/jwtUtils");
+const { registerUser, loginUser, forgotPassword, deleteUserByEmail, getUserByEmail } = require("../../controllers/UserController");
+const User = require("../../models/UserModel");
+const { generateToken } = require("../../utils/jwtUtils");
 const bcrypt = require("bcrypt");
 
 // Mock dependencies

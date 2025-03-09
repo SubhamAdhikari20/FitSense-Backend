@@ -1,7 +1,7 @@
 // tests/userRoutes.test.js
 const request = require("supertest");
-const app = require("../index"); // Ensure your Express app is exported from this file
-const User = require("../models/UserModel");
+const app = require("../../index"); // Ensure your Express app is exported from this file
+const User = require("../../models/UserModel");
 
 // Mock the User model methods (if desired)
 jest.mock("../models/UserModel", () => ({

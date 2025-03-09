@@ -13,7 +13,7 @@ router.put("/update_profile_details/:id", authGuard, updateTrainerProfileDetails
 
 router.delete("/delete_trainer", authGuard, deleteTrainer);
 
-router.get("/get_all_workouts", authGuard, getAllTrainers);
+router.get("/get_all_trainers", authGuard, getAllTrainers);
 router.get("/view_trainer_by_email", getTrainerByEmail);
 
 
