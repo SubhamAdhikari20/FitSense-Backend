@@ -1,4 +1,5 @@
 const userModel = require("../models/UserModel");
+const trainerModel = require("../models/TrainerModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { createError } = require("./../error");
@@ -272,6 +273,15 @@ const getUserDashboard = async (req, res, next) => {
     }
 }
 
+const getAllTrainersByUser= async (req, res) => {
+    try {
+        const trainers = await trainerModel.findAll();
+        return res.status(200).json({ trainers });
+    }
+    catch (error) {
+        res.status(500).json({ error: "Failed to retrive trainer data" })
+    }
+};
 
 
-module.exports = { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserByEmail, getAllUsers, getUserDashboard };
+module.exports = { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserByEmail, getAllUsers,getAllTrainersByUser, getUserDashboard };

@@ -1,7 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../database/Database");
 
-const Workout = sequelize.define("Post", {
+const Workout = sequelize.define("Workout", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,

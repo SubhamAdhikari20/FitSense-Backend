@@ -11,6 +11,7 @@ const userRoute = require("./routes/UserRoute");
 const trainerRoute = require("./routes/TrainerRoute");
 const adminRoute = require("./routes/AdminRoute");
 const workoutRoute = require("./routes/WorkoutRoute");
+const bookTrainerRoute = require("./routes/BookTrainerRoute");
 
 
 // Creating a server 
@@ -29,6 +30,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // User Route
 app.use("/api/user", userRoute);
+
+// BookTrainer Route
+app.use("/api/user", bookTrainerRoute);
 
 // Trainer Route
 app.use("/api/trainer", trainerRoute);
