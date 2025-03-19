@@ -1,4 +1,5 @@
 const bookTrainerModel = require("./../models/BookTrianerModel");
+const userModel = require("./../models/UserModel");
 
 
 // Create a new booking for the current user
@@ -8,7 +9,7 @@ const bookTrainer = async (req, res) => {
         const currentUserId = req.user.id;
 
         console.log(currentUserId);
-        
+
         // Check if the user has already booked the trainer
         const existingBooking = await bookTrainerModel.findOne({
             where: {
@@ -67,7 +68,7 @@ const getAllBookedTrainers = async (req, res) => {
     try {
         const currentUserId = req.user.id;
 
-        // Retrieve bookings for the current user where 'booke' is true
+        // Retrieve bookings for the current user where 'booked' is true
         const bookings = await bookTrainerModel.findAll({
             where: {
                 // booked: true,
@@ -81,5 +82,52 @@ const getAllBookedTrainers = async (req, res) => {
     }
 };
 
+// const getAllTrainees = async (req, res) => {
+//     try {
+//         const currentUserId = req.user.id;
 
-module.exports = { getAllBookedTrainers, bookTrainer, cancelBooking };
+//         // Retrieve bookings for the current user where 'booked' is true
+//         const bookings = await bookTrainerModel.findAll({
+//             where: {
+//                 trainerId: currentUserId
+//             }
+//         });
+//         return res.status(200).json({ bookings });
+//     } catch (error) {
+//         console.error("Error fetching booked trainers:", error);
+//         return res.status(500).json({ error: "Failed to fetch booked trainers" });
+//     }
+// };
+
+const getAllTrainees = async (req, res) => {
+    try {
+        const currentTrainerId = req.user.id;
+
+        if (!currentTrainerId) {
+            return res.status(400).json({ error: "Trainer ID not found in token!" });
+        }
+
+        // Find all booking records where the logged‐in trainer is the one being booked,
+        // and include the associated User details.
+        const bookings = await bookTrainerModel.findAll({
+            where: {
+                trainerId: currentTrainerId
+            },
+            include: [{
+                model: userModel,
+                as: "User",
+                attributes: ["id", "fullName", "phoneNumber", "email", "profilePicture"]
+            }]
+        });
+        // Map each booking to its associated User (trainee)
+        const trainees = bookings.map(booking => booking.User);
+
+        return res.status(200).json({ trainees });
+    } catch (error) {
+        console.error("Error fetching trainees:", error);
+        return res.status(500).json({ error: "Failed to fetch trainees" });
+    }
+};
+
+
+module.exports = { getAllBookedTrainers, getAllTrainees, bookTrainer, cancelBooking };

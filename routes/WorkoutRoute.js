@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authGuard } = require("./../middleware/AuthGuard");
 
-const { addWorkout, getAllWorkouts, updateWorkout, deleteWorkout, toggleCompletion, getLifeTimeWorkouts, getWeeklyStats, getTodayWorkouts } = require("../controllers/WorkoutController");
+const { addWorkout, getAllWorkouts, updateWorkout, deleteWorkout, toggleCompletion, getLifeTimeWorkouts, getWeeklyStats, getTodayWorkouts, getTraineeTodaysWorkoutsByTrainer } = require("../controllers/WorkoutController");
 
 
 router.post("/add_workout", authGuard, addWorkout);
@@ -15,6 +15,7 @@ router.get("/todays_workouts", authGuard, getTodayWorkouts);
 router.get("/lifetime_workouts", authGuard, getLifeTimeWorkouts);
 router.get("/weekly_stats", authGuard, getWeeklyStats);
 
+router.get("/get_all_workouts_by_trainer", authGuard, getTraineeTodaysWorkoutsByTrainer);
 
 // Export the route
 module.exports = router;

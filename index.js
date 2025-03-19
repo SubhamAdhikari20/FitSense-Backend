@@ -31,11 +31,14 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // User Route
 app.use("/api/user", userRoute);
 
-// BookTrainer Route
-app.use("/api/user", bookTrainerRoute);
+// BookTrainer Route for User
+app.use("/api", bookTrainerRoute);
 
 // Trainer Route
 app.use("/api/trainer", trainerRoute);
+
+// BookTrainer Route for Trainer
+// app.use("/api/trainer", bookTrainerRoute);
 
 // Admin Route
 app.use("/api/admin", adminRoute);

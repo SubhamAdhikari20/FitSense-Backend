@@ -55,7 +55,7 @@ const registerUser = async (req, res) => {
 
         // Generate Token
         const token = jwt.sign(
-            { id: newUser.id, email: newUser.email },
+            { id: newUser.id, email: newUser.email, role: "user" },
             process.env.JWT_SECRET,
             { expiresIn: `${process.env.JWT_SIGNUP_EXPIRES_IN}` }
         );
@@ -100,7 +100,7 @@ const loginUser = async (req, res) => {
 
         // Generate Token
         const token = jwt.sign(
-            { id: checkExistingUser.id, email: checkExistingUser.email },
+            { id: checkExistingUser.id, email: checkExistingUser.email, role: "user" },
             process.env.JWT_SECRET,
             { expiresIn: `${process.env.JWT_LOGIN_EXPIRES_IN}` }
         );
@@ -244,6 +244,22 @@ const getUserByEmail = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const user = await userModel.findOne({ where: { id: userId } });
+        if (!user) {
+            return res.status(404).json({ error: "User not found!" });
+        }
+        // Return the trainee data with the key 'trainee' (as expected on the frontend)
+        return res.status(200).json({ trainee: user });
+    } catch (error) {
+        console.error("Error retrieving user data:", error);
+        return res.status(500).json({ error: "Failed to retrieve user data" });
+    }
+};
+
 
 const getAllUsers = async (res) => {
     try {
@@ -273,7 +289,7 @@ const getUserDashboard = async (req, res, next) => {
     }
 }
 
-const getAllTrainersByUser= async (req, res) => {
+const getAllTrainersByUser = async (req, res) => {
     try {
         const trainers = await trainerModel.findAll();
         return res.status(200).json({ trainers });
@@ -284,4 +300,4 @@ const getAllTrainersByUser= async (req, res) => {
 };
 
 
-module.exports = { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserByEmail, getAllUsers,getAllTrainersByUser, getUserDashboard };
+module.exports = { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserByEmail, getUserById, getAllUsers, getAllTrainersByUser, getUserDashboard };

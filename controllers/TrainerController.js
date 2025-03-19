@@ -57,7 +57,7 @@ const registerTrainer = async (req, res) => {
 
         // Generate Token
         const token = jwt.sign(
-            { id: newTrainer.id, email: newTrainer.email },
+            { id: newTrainer.id, email: newTrainer.email, role: "trainer" },
             process.env.JWT_SECRET,
             { expiresIn: "9999 years" }
         );
@@ -100,7 +100,7 @@ const loginTrainer = async (req, res) => {
 
         // Generate Token
         const token = jwt.sign(
-            { id: checkExistingTrainer.trainerId, email: checkExistingTrainer.email },
+            { id: checkExistingTrainer.id, email: checkExistingTrainer.email, role: "trainer" },
             process.env.JWT_SECRET,
             { expiresIn: "24h" }
         );

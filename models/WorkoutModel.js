@@ -1,5 +1,7 @@
 const { DataTypes } = require("sequelize");
 const { sequelize } = require("../database/Database");
+const User = require("./UserModel");
+const Trainer = require("./TrainerModel");
 
 const Workout = sequelize.define("Workout", {
     id: {
@@ -54,5 +56,7 @@ const Workout = sequelize.define("Workout", {
     timestamps: true,   // This ensures Sequelize uses 'createdAt' and 'updatedAt'
 });
 
+Workout.belongsTo(User, { foreignKey: 'userId', as: "User" });
+Workout.belongsTo(Trainer, { foreignKey: 'trainerId', as: "Trainer" });
 
 module.exports = Workout;

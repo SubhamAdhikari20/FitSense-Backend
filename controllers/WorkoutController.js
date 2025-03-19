@@ -10,7 +10,7 @@ dotenv.config();
 
 
 const addWorkout = async (req, res) => {
-    const { userId, category, workoutName, sets, reps, weight, duration, caloriesBurned } = req.body;
+    const { category, workoutName, sets, reps, weight, duration, caloriesBurned, userId } = req.body;
     // const userId = req.user?.id;
     // const trainerId = req.trainer?.id;
 
@@ -19,7 +19,7 @@ const addWorkout = async (req, res) => {
     }
 
     try {
-        if (req.user?.id) {
+        if (req.user?.id && req.user.role === "user") {
             // Add new Workout
             const newWorkout = await workoutModel.create({
                 userId: req.user?.id,
@@ -29,21 +29,25 @@ const addWorkout = async (req, res) => {
                 reps,
                 weight,
                 duration,
-                caloriesBurned
+                caloriesBurned,
+                completed: false
             });
 
             return res.status(201).json({ message: "Workout added successfully!", workout: newWorkout });
         }
-        else if (req.trainer?.id) {
+        else if (req.user?.id && req.user.role === "trainer") {
             // Add new Workout
             const newWorkout = await workoutModel.create({
-                trainerId: req.trainer?.id,
+                trainerId: req.user?.id,
+                userId: userId,
                 category,
                 workoutName,
                 sets,
                 reps,
                 weight,
-                duration
+                duration,
+                caloriesBurned,
+                completed: false
             });
 
             return res.status(201).json({ message: "Workout added successfully!", workout: newWorkout });
@@ -127,23 +131,106 @@ const getTodayWorkouts = async (req, res) => {
             return res.status(401).json({ error: "Unauthorized access" });
         }
 
-        // Create date range in UTC
-        const startOfDay = new Date(date);
-        startOfDay.setHours(0, 0, 0, 0);
+        let workouts;
+        const startDate = new Date(date);
+        startDate.setUTCHours(0, 0, 0, 0);
+        const endDate = new Date(date);
+        endDate.setUTCHours(23, 59, 59, 999);
 
-        const endOfDay = new Date(date);
-        endOfDay.setHours(23, 59, 59, 999);
+        if (req.user.role === "trainer") {
+            workouts = await workoutModel.findAll({
+                where: {
+                    trainerId: req.user.id,
+                    createdAt: { [Op.between]: [startDate, endDate] }
+                },
+                include: [{
+                    model: userModel,
+                    as: "User",
+                    attributes: ["id", "fullName"]
+                }],
+                order: [['createdAt', 'DESC']]
+            });
+        }
+        else if (req.user.role === "user") {
+            workouts = await workoutModel.findAll({
+                where: {
+                    userId: req.user.id,
+                    createdAt: { [Op.between]: [startDate, endDate] }
+                },
+                order: [['createdAt', 'DESC']]
+            });
+        }
+        else {
+            return res.status(401).json({ error: "Unauthorized access" });
+        }
+
+        // // Determine the filter field based on the role
+        // const role = req.user.role;
+        // let filterField;
+        // if (role === "user") {
+        //     filterField = "userId";
+        // } 
+        // else if (role === "trainer") {
+        //     filterField = "trainerId";
+        // } 
+        // else {
+        //     return res.status(401).json({ error: "Unauthorized access" });
+        // }
+
+        // // Create date range in UTC
+        // const startOfDay = new Date(date);
+        // startOfDay.setHours(0, 0, 0, 0);
+
+        // const endOfDay = new Date(date);
+        // endOfDay.setHours(23, 59, 59, 999);
+
+        // const workouts = await workoutModel.findAll({
+        //     where: {
+        //         [filterField]: userId,
+        //         createdAt: {
+        //             [Op.between]: [
+        //                 startOfDay.toISOString(),
+        //                 endOfDay.toISOString()
+        //             ]
+        //         }
+        //     },
+        //     order: [['createdAt', 'DESC']]
+        // });
+
+        return res.status(200).json({ workouts });
+    }
+    catch (error) {
+        console.error("Error fetching todays workouts:", error);
+        return res.status(500).json({ error: "Internal server error!", details: error.message });
+    }
+}
+
+
+const getTraineeTodaysWorkoutsByTrainer = async (req, res) => {
+    try {
+        const { date, userId } = req.query;
+        // console.log("User ID:", userId);
+
+        if (req.user.role !== "trainer") {
+            return res.status(401).json({ error: "Unauthorized access" });
+        }
+
+        const startDate = new Date(date);
+        startDate.setUTCHours(0, 0, 0, 0);
+        const endDate = new Date(date);
+        endDate.setUTCHours(23, 59, 59, 999);
 
         const workouts = await workoutModel.findAll({
             where: {
+                trainerId: req.user.id,
                 userId: userId,
-                createdAt: {
-                    [Op.between]: [
-                        startOfDay.toISOString(),
-                        endOfDay.toISOString()
-                    ]
-                }
+                createdAt: { [Op.between]: [startDate, endDate] }
             },
+            include: [{
+                model: userModel,
+                as: "User",
+                attributes: ["id", "fullName"]
+            }],
             order: [['createdAt', 'DESC']]
         });
 
@@ -153,7 +240,7 @@ const getTodayWorkouts = async (req, res) => {
         console.error("Error fetching todays workouts:", error);
         return res.status(500).json({ error: "Internal server error!", details: error.message });
     }
-}
+};
 
 
 const getLifeTimeWorkouts = async (req, res) => {
@@ -295,26 +382,26 @@ const updateWorkout = async (req, res) => {
     const { category, workoutName, sets, reps, weight, duration, caloriesBurned } = req.body;
 
     try {
+        const workout = await workoutModel.findOne({ where: { id } });
+        if (!workout) {
+            return res.status(404).json({ error: "Workout not found" });
+        }
 
-        if (req.user?.id) {
-            const userId = req.user?.id;
-            const workout = await workoutModel.findOne({ where: { id } });
-
-            if (!workout) {
-                return res.status(404).json({ error: "Workout not found" });
+        if (req.user?.id && req.user.role === "user") {
+            if (workout.userId !== req.user.id) {
+                return res.status(403).json({ error: "Unauthorized to update this workout" });
             }
+
             // Update the workout instance
             await workout.update({ category, workoutName, sets, reps, weight, duration, caloriesBurned });
 
             return res.status(200).json({ message: "Workout updated successfully", workout });
         }
-        else if (req.trainer?.id) {
-            const trainerId = req.trainer?.id;
-            const workout = await workoutModel.findOne({ where: { id } });
-
-            if (!workout) {
-                return res.status(404).json({ error: "Workout not found" });
+        else if (req.user?.id && req.user.role === "trainer") {
+            if (workout.trainerId !== req.user.id) {
+                return res.status(403).json({ error: "Unauthorized to update this workout" });
             }
+
             // Update the workout instance
             await workout.update({ category, workoutName, sets, reps, weight, duration, caloriesBurned });
 
@@ -357,23 +444,17 @@ const updateWorkout = async (req, res) => {
 const deleteWorkout = async (req, res) => {
     const { id } = req.params;
     try {
-        if (req.user?.id) {
-            const userId = req.user?.id;
-            const workout = await workoutModel.findOne({ where: { id } });
+        const workout = await workoutModel.findOne({ where: { id } });
 
-            if (!workout) {
-                return res.status(404).json({ error: "Workout not found" });
-            }
+        if (!workout) {
+            return res.status(404).json({ error: "Workout not found" });
+        }
+
+        if (req.user?.id && req.user.role === "user") {
             await workout.destroy();
             return res.status(200).json({ message: "Workout deleted successfully" });
         }
-        else if (req.trainer?.id) {
-            const trainerId = req.trainer?.id;
-            const workout = await workoutModel.findOne({ where: { id } });
-
-            if (!workout) {
-                return res.status(404).json({ error: "Workout not found" });
-            }
+        else if (req.user?.id && req.user.role === "trainer") {
             await workout.destroy();
             return res.status(200).json({ message: "Workout deleted successfully" });
         }
@@ -408,7 +489,10 @@ const deleteWorkout = async (req, res) => {
 const toggleCompletion = async (req, res) => {
     const { id } = req.params;
     const userId = req.user?.id;
-
+    if (req.user.role === "trainer") {
+        // Trainers are not allowed to toggle completion.
+        return res.status(403).json({ error: "Trainers are not permitted to change workout completion status" });
+    }
     try {
         if (userId) {
             const workout = await workoutModel.findOne({ where: { id } });
@@ -428,4 +512,4 @@ const toggleCompletion = async (req, res) => {
     }
 };
 
-module.exports = { addWorkout, getAllWorkouts, updateWorkout, deleteWorkout, toggleCompletion, getLifeTimeWorkouts, getWeeklyStats, getTodayWorkouts };
+module.exports = { addWorkout, getAllWorkouts, updateWorkout, deleteWorkout, toggleCompletion, getLifeTimeWorkouts, getWeeklyStats, getTodayWorkouts, getTraineeTodaysWorkoutsByTrainer };

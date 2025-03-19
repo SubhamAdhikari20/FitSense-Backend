@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { authGuard } = require("./../middleware/AuthGuard");
 const upload = require('./../middleware/UploadImage');
-const { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserByEmail, getAllTrainersByUser, getUserDashboard } = require("./../controllers/UserController")
+const { registerUser, loginUser, forgotPassword, uploadImage, updateProfileDetails, deleteUser, getUserById, getUserByEmail, getAllTrainersByUser, getUserDashboard } = require("./../controllers/UserController")
 
 router.post("/register_user", registerUser);
 router.post("/login_user", loginUser);
@@ -14,7 +14,8 @@ router.put("/update_profile_details/:id", authGuard, updateProfileDetails);
 router.delete("/delete_user", authGuard, deleteUser);
 
 router.get("/get_all_trainers", authGuard, getAllTrainersByUser);
-router.get("/view_user_by_email", getUserByEmail);
+router.get("/get_user_by_email", getUserByEmail);
+router.get("/get_user_by_id/:id", getUserById);
 router.get("/dashboard", authGuard, getUserDashboard);
 
 
